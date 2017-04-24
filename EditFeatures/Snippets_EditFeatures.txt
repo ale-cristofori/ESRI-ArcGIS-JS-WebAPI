@@ -1,0 +1,135 @@
+// ---------------------------------------------------
+// Code Snippets for Exercise: Edit Features
+// ---------------------------------------------------
+
+
+/*
+ * URLs used in this exercise
+ * 
+ * Wildfire Response Points layer on SampleServer6
+ *   http://sampleserver6.arcgisonline.com/arcgis/rest/services/Wildfire/FeatureServer/0
+ *
+ * Wildfire Response Lines layer on SampleServer6
+ *   http://sampleserver6.arcgisonline.com/arcgis/rest/services/Wildfire/FeatureServer/1
+ *
+ * Wildfire Response Polygons layer on SampleServer6
+ *   http://sampleserver6.arcgisonline.com/arcgis/rest/services/Wildfire/FeatureServer/2
+ *
+ * GeometryServer on ArcGIS Online:
+ *   http://sampleserver6.arcgisonline.com/arcgis/rest/services/Utilities/Geometry/GeometryServer
+ *
+ */
+
+
+// ---------------------------------------------------
+
+    /*
+     * Step: Construct the editable layers
+     */
+    flFirePoints = new FeatureLayer("URL_to_Wildfire_Response_Points_layer", {
+      outFields : ['*']
+    });
+    flFireLines = new FeatureLayer("URL_to_Wildfire_Response_Lines_layer", {
+      outFields : ['*']
+    });
+    flFirePolygons = new FeatureLayer("URL_to_Wildfire_Response_Polygons_layer", {
+      outFields : ['*']
+    });
+    
+
+// ---------------------------------------------------
+
+      /*
+       * Step: Prepare the Editor widget settings
+       */
+      var editorSettings = {
+        map : mapMain,
+        geometryService : new GeometryService("URL_to_Geometry_service"),
+        layerInfos : layerInfosWildfire
+      };
+      
+
+// ---------------------------------------------------
+
+      /*
+       * Step: Build the Editor constructor's first parameter
+       */
+      var editorParams = {
+        settings : editorSettings
+      };
+
+
+// ---------------------------------------------------
+
+      /*
+       * Step: Construct the Editor widget
+       */
+      widgetEditor = new Editor(editorParams, 'divLeft');
+      widgetEditor.startup();
+
+
+// ---------------------------------------------------
+
+        toolbarVisible : true
+
+
+// ---------------------------------------------------
+
+      /*
+       * Step: Map the event results into an array of Layer objects
+       */
+      var layersWildfire = array.map(results.layers, function(result) {
+        return result.layer;
+      });
+
+
+// ---------------------------------------------------
+
+      /*
+       * Step: Add a custom TemplatePicker widget
+       */
+      var tpCustom = new TemplatePicker({
+        featureLayers : layersWildfire,
+        columns : 2
+      }, 'divLeft');
+      tpCustom.startup();
+
+
+// ---------------------------------------------------
+
+        templatePicker : tpCustom
+
+
+// ---------------------------------------------------
+
+        createOptions : {
+          polygonDrawTools : [Editor.CREATE_TOOL_FREEHAND_POLYGON, Editor.CREATE_TOOL_RECTANGLE, Editor.CREATE_TOOL_TRIANGLE, Editor.CREATE_TOOL_CIRCLE]
+        }
+
+// ---------------------------------------------------
+
+        toolbarOptions : {
+          reshapeVisible : true
+        }
+
+
+// ---------------------------------------------------
+
+    /*
+     * Step: Specify the proxy Url
+     */
+    config.defaults.io.proxyUrl = "http://localhost/proxy/proxy.ashx";
+
+
+// ---------------------------------------------------
+
+        enableUndoRedo : true
+
+
+// ---------------------------------------------------
+
+        maxUndoRedoOperations : 20
+
+
+// ---------------------------------------------------
+// ---------------------------------------------------

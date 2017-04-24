@@ -1,0 +1,60 @@
+// ---------------------------------------------------
+// Code Snippets for Exercise: Getting Started
+// ---------------------------------------------------
+//
+// ---------------------------------------------------
+
+    <!--
+    -- Step: Reference the ArcGIS API for JavaScript and Esri CSS
+    -->
+    <link rel="stylesheet" href="http://js.arcgis.com/3.18/esri/css/esri.css">
+    <script src="http://js.arcgis.com/3.18/"></script>
+
+
+// ---------------------------------------------------
+
+    /*
+     *  Step: Configure dojo for asynchronous module loading
+     */
+    var dojoConfig = {
+      async : true
+    };
+
+    
+// ---------------------------------------------------    
+        
+    /*
+     *  Step: Require the esri/map module and the dojo/domReady! plugin
+     */
+    require(["esri/map", "dojo/domReady!"], function(Map) {
+      var myMap = new Map("divMap", {
+        basemap : "topo",
+        center : [-122.45, 37.75],
+        zoom : 12
+      });
+    });
+
+
+// ---------------------------------------------------
+  
+  <!--
+    -- Step: Create a <div> in which the Map will display
+    -->
+    <div id="divMap"></div>
+
+    
+// ---------------------------------------------------
+    
+/*
+ * Step: Add #divMap as a third selector
+ */
+html, body, #divMap {
+
+
+// ---------------------------------------------------
+
+    <!--
+    -- Step: Reference the gettingstarted.css file
+    -->
+    <link rel="stylesheet" href="css/gettingstarted.css"/>
+      

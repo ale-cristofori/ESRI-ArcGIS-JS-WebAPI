@@ -1,0 +1,17 @@
+// ---------------------------------------------------
+// Code Snippets for Exercise: SearchWidget
+// ---------------------------------------------------
+
+    /*
+     * Step: Add the Search widget
+     */
+    var dijitSearch= new Search({
+      map : mapMain,
+      autoComplete : true,
+      arcgisGeocoder : {
+        suffix : " Redlands, CA"
+      }
+    }, "divSearch");
+    dijitSearch.startup();
+
+

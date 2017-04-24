@@ -1,0 +1,76 @@
+// ---------------------------------------------------
+// Code Snippets for Exercise: LocatorTask
+// ---------------------------------------------------
+
+/*
+ * URLs used in this exercise
+ * 
+ * World Geocoding Service on geocode.arcgis.com:
+ *   http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer
+ *
+ */
+
+
+// ---------------------------------------------------
+
+    /*
+    * Step: Construct and bind the Locator task
+    */
+    taskLocator = new Locator("Paste_in_URL_to_World_Geocoding_Service");
+
+
+// ---------------------------------------------------
+
+      /*
+       * Step: Complete the Locator input parameters
+       */
+      var objAddress = {
+        "SingleLine" : dom.byId("taAddress").value
+      }
+      var params = {
+        address : objAddress,
+        outFields : ["Loc_name"]
+      }
+
+
+// ---------------------------------------------------
+
+    /*
+     * Step: Wire the button's onclick event handler
+     */
+    on(dom.byId("btnLocate"), "click", doAddressToLocations); 
+
+
+// ---------------------------------------------------
+
+    /*
+     * Step: Wire the task's completion event handler
+     */
+    taskLocator.on("address-to-locations-complete", showResults);
+
+
+// ---------------------------------------------------
+
+      /*
+       * Step: Execute the task
+       */
+      taskLocator.addressToLocations(params);
+
+
+// ---------------------------------------------------
+
+          /*
+           * Step: Retrieve the result's geometry
+           */
+          geometryLocation = candidate.location;
+
+
+// ---------------------------------------------------
+
+          /*
+           * Step: Display the geocoded location on the map
+           */
+          var graphicResult = new Graphic(geometryLocation, symbolMarker, attributesCandidate);
+          mapMain.graphics.add(graphicResult);
+
+

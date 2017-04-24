@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Analysis - Create Drive Time Areas</title>
+    <link rel="stylesheet" href="//js.arcgis.com/3.18/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="//js.arcgis.com/3.18/esri/css/esri.css">
+    <style>
+        html, body, #border-container {
+            height: 100%;
+            margin: 0;
+        }
+
+        .closeIcon {
+            display: none;
+        }
+    </style>
+    <script src="//js.arcgis.com/3.18/"></script>
+    <script>
+        require([
+            "dojo/ready", "dojo/parser", "esri/urlUtils", "esri/map", "esri/layers/FeatureLayer", "esri/dijit/analysis/CreateDriveTimeAreas", "esri/InfoTemplate", "dijit/ProgressBar",
+            "dijit/layout/BorderContainer", "dijit/layout/ContentPane"
+        ], function (ready, parser, urlUtils, Map, FeatureLayer, CreateDriveTimeAreas, InfoTemplate, ProgressBar) {
+            ready(function () {
+                parser.parse();
+
+                var map = new Map("map", {
+                    basemap: "gray",
+                    center: [-117.55, 34.02],
+                    zoom: 11
+                });
+
+                var pointLayer = new FeatureLayer("http://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/New_Store_Location/FeatureServer/0");
+                var polygonLayer = new FeatureLayer("http://services.arcgisonline.com/ArcGIS/rest/services/Demographics/USA_Retail_Spending_Potential/MapServer/2", {
+                    opacity: 0.5
+                });
+                map.addLayers([polygonLayer, pointLayer]);
+
+                var progressBar = new ProgressBar({
+                    indeterminate: true,
+                    style: "display: none;"
+                }, "progressbar");
+
+                var analysisTool;
+                map.on("layers-add-result", function () {
+                    analysisTool = new CreateDriveTimeAreas({
+                        inputLayer: pointLayer,
+                        travelMode: "Driving",
+                        portalUrl: "http://www.arcgis.com",
+                        map: map,
+                        returnFeatureCollection: true
+                    }, "toolPane");
+                    analysisTool.on("job-submit", function () {
+                        progressBar.domNode.style.display = "block";
+                    });
+                    analysisTool.on("job-result", parseResult);
+
+
+                });
+
+                function parseResult(result) {
+                    analysisTool.set("disableRunAnalysis", false);
+                    progressBar.domNode.style.display = "none";
+                    var resultLayer = new FeatureLayer(result.value.url || result.value, {
+                        outFields: ['*'],
+                        infoTemplate: new InfoTemplate()
+                    });
+                    map.addLayer(resultLayer);
+                }
+
+            });
+        });
+    </script>
+</head>
+<body class="claro">
+<div id="border-container" data-dojo-type="dijit/layout/BorderContainer"
+     data-dojo-props="design:'headline',gutters:false">
+    <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'" style="padding: 0;"></div>
+    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'left'" style="width: 300px;">
+        <div id="toolPane"></div>
+        <div id="progressbar"></div>
+    </div>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,37 @@
+// ---------------------------------------------------
+// Code Snippets for Exercise: Adding widgets
+// ---------------------------------------------------
+//
+// ---------------------------------------------------
+
+    /*
+     * Step: Add the BasemapToggle widget to the map
+     */
+    
+     var toggle = new BasemapToggle({
+          map: mapMain,
+          basemap: "topo"
+      }, "BasemapToggle");
+      toggle.startup();
+
+// ---------------------------------------------------    
+
+    /*
+     * Step: Revise code to use the addLayers() method
+     */
+    
+     mapMain.addLayers([lyrUSA, lyrQuakes]);
+
+// ---------------------------------------------------  
+
+    /*
+     * Step: Add a legend once all layers have been added to the map
+     */
+    mapMain.on("layers-add-result", function() {
+      var dijitLegend = new Legend({
+        map : mapMain,
+        arrangement : Legend.ALIGN_RIGHT
+      }, "divLegend");
+      dijitLegend.startup();
+    }); // stub)
+    
