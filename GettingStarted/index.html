@@ -7,30 +7,45 @@
     <!--
     -- Step: Configure dojo for asynchronous module loading
     -->
+
+    <link rel="stylesheet" href="https://js.arcgis.com/3.20/esri/css/esri.css">
+    <link rel="stylesheet" href="css/gettingstarted.css">
+    <script src="https://js.arcgis.com/3.20/"></script>
+
     <script>
-        var dojoConfig = {};
+        var dojoConfig = {
+            async: true
+        };
+        require(['esri/map',"esri/geometry/webMercatorUtils", "dojo/dom" ,'dojo/domReady!'],
+                function (Map, webMercatorUtils, dom) {
+                    myMap = new Map('divMap',{
+                        basemap: "topo",
+                        center: [-122.45, 37.75],
+                        zoom: 12
+                    });
+                    myMap.on('load', function () {
+                        myMap.on("mouse-move", showCoordinates);
+                        myMap.on("mouse-drag", showCoordinates);
+                    });
+                    function showCoordinates (evt) {
+                        var mp = webMercatorUtils.webMercatorToGeographic(evt.mapPoint);
+                        dom.byId("info").innerHTML = mp.x.toFixed(3) + ", " + mp.y.toFixed(3);
+                    }
+        });
     </script>
 
-    <!--
-    -- Step: Reference the ArcGIS API for JavaScript and Esri CSS
-    -->
 
 
     <!--
     -- Step: Reference the gettingstarted.css file
     -->
-
-
-    <script>
-        /*
-         *  Step: Require the esri/map module and the dojo/domReady! plugin
-         */
-
-
-    </script>
 </head>
 
 <body>
+
+<div ID="divMap">
+    <span id="info" style="position:absolute; left:15px; bottom:5px; color:#000; z-index:50;  font-weight: bold;"></span>
+</div>
 <!--
 -- Step: Create a <div> in which the Map will display
 -->
