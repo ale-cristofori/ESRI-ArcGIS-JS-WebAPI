@@ -19,9 +19,9 @@
         require(['esri/map',"esri/geometry/webMercatorUtils", "dojo/dom" ,'dojo/domReady!'],
                 function (Map, webMercatorUtils, dom) {
                     myMap = new Map('divMap',{
-                        basemap: "topo",
-                        center: [-122.45, 37.75],
-                        zoom: 12
+                        basemap: "national-geographic",
+                        center: [11, 46],
+                        zoom: 8
                     });
                     myMap.on('load', function () {
                         myMap.on("mouse-move", showCoordinates);
@@ -33,12 +33,6 @@
                     }
         });
     </script>
-
-
-
-    <!--
-    -- Step: Reference the gettingstarted.css file
-    -->
 </head>
 
 <body>
@@ -46,10 +40,5 @@
 <div ID="divMap">
     <span id="info" style="position:absolute; left:15px; bottom:5px; color:#000; z-index:50;  font-weight: bold;"></span>
 </div>
-<!--
--- Step: Create a <div> in which the Map will display
--->
-Hello world!
-
 </body>
 </html>
