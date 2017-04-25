@@ -7,6 +7,9 @@ require([
         "esri/symbols/SimpleFillSymbol",
         "esri/symbols/SimpleLineSymbol",
         "esri/symbols/SimpleMarkerSymbol",
+        "esri/toolbars/draw",
+        "esri/graphic",
+        "esri/tasks/query",
 
         "dojo/ready",
         "dojo/parser",
@@ -28,6 +31,7 @@ require([
         "dijit/form/Button"],
     function (Map, ArcGISDynamicMapServiceLayer, FeatureLayer,
               SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol,
+              Draw, Graphic, Query,
               ready, parser, on, dom,
               Memory, locale,
               Color, declare, array,
@@ -49,10 +53,18 @@ require([
                     UTC_DATETIME: {
                         "label": "Date/Time",
                         "formatter": function (dtQuake) {
-                            return locale.format(new Date(dtQuake));
+                            formDate = new Date(dtQuake).toLocaleDateString("en-GB");
+                            //formDate = origDate.toDateString();
+                            return formDate;
                         }
                     },
-                    MAGNITUDE: "Mag",
+                    MAGNITUDE: {
+                        "label":"Magnitude",
+                        "formatter" : function (mgQuake) {
+                            mag = new Number(mgQuake).toFixed(1);
+                            return mag;
+                        }
+                    },
                     LOCATION: "Location"
                 }
             }, "divGrid");
@@ -81,11 +93,12 @@ require([
 
 
             // Construct the Quakes layer
+            outFieldsQuakes = ["EQID", "UTC_DATETIME", "MAGNITUDE", "LOCATION"];
             var lyrQuakes = new FeatureLayer(sUrlQuakesLayer, {
                 /*
                  * Step: Set the quakes layer output fields
                  */
-
+                outFields : outFieldsQuakes
 
             });
             lyrQuakes.setDefinitionExpression("MAGNITUDE >= 2.0");
@@ -94,13 +107,15 @@ require([
             /*
              * Step: Wire the draw tool initialization function
              */
-
+            mapMain.on("load", initDrawTool);
 
             function initDrawTool() {
                 /*
                  * Step: Implement the Draw toolbar
                  */
-
+                var tbDraw = new Draw(mapMain);
+                tbDraw.on("draw-end", displayPolygon);
+                tbDraw.activate(Draw.POLYGON);
 
             }
 
@@ -118,7 +133,8 @@ require([
                 /*
                  * Step: Construct and add the polygon graphic
                  */
-
+                var graphicPolygon = new Graphic(geometryInput, tbDrawSymbol);
+                mapMain.graphics.add(graphicPolygon);
 
                 // Call the next function
                 selectQuakes(geometryInput);
@@ -141,21 +157,27 @@ require([
                 /*
                  * Step: Set the selection symbol
                  */
-
+                lyrQuakes.setSelectionSymbol(symbolSelected);
 
                 /*
                  * Step: Initialize the query
                  */
+                var queryQuakes = new Query();
+                queryQuakes.geometry = geometryInput;
+
 
 
                 /*
                  * Step: Wire the layer's selection complete event
                  */
+                lyrQuakes.on("selection-complete", populateGrid);
+
 
 
                 /*
                  * Step: Perform the selection
                  */
+                lyrQuakes.selectFeatures(queryQuakes, FeatureLayer.SELECTION_NEW);
 
 
             }
@@ -164,13 +186,25 @@ require([
 
                 var gridData;
 
+                /*
+                we can see in this function we call the map native JS method.
+                as a first argument we pass our original object containing all
+                our info in Key Value Pairs but not how we want them to display.
+
+                The second argument is every single element in the original array
+                of object features (results.features) we can see we use the argument
+                as "feature" because the iteration over every element of the array is
+                handled through the map function
+                 */
                 dataQuakes = array.map(results.features, function (feature) {
                     return {
                         /*
                          * Step: Reference the attribute field values
                          */
-
-
+                        "EQID": feature.attributes[outFieldsQuakes[0]],
+                        "UTC_DATETIME": feature.attributes[outFieldsQuakes[1]],
+                        "MAGNITUDE": feature.attributes[outFieldsQuakes[2]],
+                        "LOCATION": feature.attributes[outFieldsQuakes[3]]
                     }
                 });
 

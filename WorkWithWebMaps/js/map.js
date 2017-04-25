@@ -4,7 +4,7 @@ var legendLayers;
 /*
  * Step: Update the Web map Id
  */
-var webmapId = "";
+var webmapId = "7d987ba67f4640f0869acb82ba064228";
 
 
 // @formatter:off
@@ -15,6 +15,7 @@ require([
         "esri/layers/ArcGISDynamicMapServiceLayer",
         "esri/layers/FeatureLayer",
         "esri/dijit/Legend",
+        "esri/dijit/BasemapGallery",
 
         "dojo/ready",
         "dojo/parser",
@@ -23,7 +24,7 @@ require([
         "dijit/layout/BorderContainer",
         "dijit/layout/ContentPane"],
     function (Map, arcgisUtils, Extent, ArcGISDynamicMapServiceLayer, FeatureLayer, Legend,
-              ready, parser, on,
+              BasemapGallery, ready, parser, on,
               BorderContainer, ContentPane) {
 // @formatter:on
 
@@ -50,26 +51,33 @@ require([
              * Step: Create a map using a web map ID
             */
 
-            // arcgisUtils.createMap(webmapId,"cpCenter").then(function(response){
+            arcgisUtils.createMap(webmapId,"cpCenter").then(rehydrateMap);
 
-				/*
-				 * Step: Get the map from the response
-				*/
-				
-				
-				/*
-                 * Step: update the Legend
-				*/
-
-
-            // });   
-
-
+            function rehydrateMap(response) {
+                if (response.errors.length == 0) {
+                    var mapMain = response.map;
+                    basemapGallery = new BasemapGallery({
+                        showArcGISBasemaps: true,
+                        map: mapMain
+                    }, "basemapGallery");
+                    basemapGallery.startup();
+                    legendLayers = arcgisUtils.getLegendLayers(response);
+                    var dijitLegend = new Legend({
+                                map: mapMain,
+                                arrangement: Legend.ALIGN_RIGHT,
+                                layerInfos: legendLayers
+                            }, "divLegend");
+                            dijitLegend.startup();
+                }
+                else{
+                    alert("Remote map not correctly initialised, please check you have access to the remote server");
+                }
+            }
             //create a map
-            mapMain = new Map("cpCenter", {
-                basemap: "satellite",
-                extent: extentInitial
-            });
+            // mapMain = new Map("cpCenter", {
+            //     basemap: "satellite",
+            //     extent: extentInitial
+            // });
 
             // Add the USA map service to the map
             var lyrUSA = new ArcGISDynamicMapServiceLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer", {
@@ -80,17 +88,17 @@ require([
             // Add the earthquakes layer to the map
             var lyrQuakes = new FeatureLayer("http://ags103gg.cloudapp.net/arcgis/rest/services/Courses/Earthquakes/MapServer/0");
             lyrQuakes.setDefinitionExpression("MAGNITUDE >= 2.0");
-            mapMain.addLayers([lyrUSA, lyrQuakes]);
+            //mapMain.addLayers([lyrUSA, lyrQuakes]);
 
 
             // Add the legend to the map
-            mapMain.on("layers-add-result", function () {
-                var dijitLegend = new Legend({
-                    map: mapMain,
-                    arrangement: Legend.ALIGN_RIGHT
-                }, "divLegend");
-                dijitLegend.startup();
-            });
+            // mapMain.on("layers-add-result", function () {
+            //     var dijitLegend = new Legend({
+            //         map: mapMain,
+            //         arrangement: Legend.ALIGN_RIGHT
+            //     }, "divLegend");
+            //     dijitLegend.startup();
+            // });
 
 
         });

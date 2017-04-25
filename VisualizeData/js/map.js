@@ -3,11 +3,14 @@ require([
         "esri/map",
         "esri/layers/ArcGISDynamicMapServiceLayer",
         "esri/layers/FeatureLayer",
+        "esri/layers/LayerDrawingOptions",
 
         "esri/symbols/SimpleFillSymbol",
         "esri/symbols/SimpleLineSymbol",
         "esri/symbols/SimpleMarkerSymbol",
         "esri/Color",
+
+        "esri/renderers/ClassBreaksRenderer",
 
         "dojo/ready",
         "dojo/parser",
@@ -21,9 +24,9 @@ require([
         "dijit/layout/BorderContainer",
         "dijit/layout/ContentPane",
         "dijit/form/Button"],
-    function (Map, ArcGISDynamicMapServiceLayer, FeatureLayer,
+    function (Map, ArcGISDynamicMapServiceLayer, FeatureLayer, LayerDrawingOptions,
               SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Color,
-              ready, parser, on, dom,
+              ClassBreaksRenderer,ready, parser, on, dom,
               declare, array,
               BorderContainer, ContentPane, Button) {
 // @formatter:on
@@ -110,18 +113,52 @@ require([
                 /*
                  * Step: Construct a class breaks renderer
                  */
+                var cbrCountyPopDensity = new ClassBreaksRenderer(symDefault, "pop00_sqmi");
 
 
                 /*
                  * Step: Define the class breaks
                  */
+                cbrCountyPopDensity.addBreak(0, 10, new SimpleFillSymbol().setColor(new Color([254, 240, 217])));
+                cbrCountyPopDensity.addBreak(10, 100, new SimpleFillSymbol().setColor(new Color([253, 204, 138])));
+                cbrCountyPopDensity.addBreak(100, 1000, new SimpleFillSymbol().setColor(new Color([252, 141, 89])));
+                cbrCountyPopDensity.addBreak(1000, 10000, new SimpleFillSymbol().setColor(new Color([227, 74, 51])));
+                cbrCountyPopDensity.addBreak(10000, 100000, new SimpleFillSymbol().setColor(new Color([179, 0, 0])));
 
+                // cbrCountyPopDensity.addBreak({
+                //     minValue: 0,
+                //     maxValue: 10,
+                //     symbol: new SimpleFillSymbol().setColor(new Color([254, 240, 217]))
+                // });
+                // cbrCountyPopDensity.addBreak({
+                //     minValue: 10,
+                //     maxValue: 100,
+                //     symbol: new SimpleFillSymbol().setColor(new Color([253, 204, 138]))
+                // });
+                // cbrCountyPopDensity.addBreak({
+                //     minValue: 100,
+                //     maxValue: 1000,
+                //     symbol: new SimpleFillSymbol().setColor(new Color([252, 141, 89]))
+                // });
+                // cbrCountyPopDensity.addBreak({
+                //     minValue: 1000,
+                //     maxValue: 10000,
+                //     symbol: new SimpleFillSymbol().setColor(new Color([227, 74, 51]))
+                // });
+                // cbrCountyPopDensity.addBreak({
+                //     minValue: 10000,
+                //     maxValue: 100000,
+                //     symbol: new SimpleFillSymbol().setColor(new Color([179, 0, 0]))
+                // });
 
                 /*
                  * Step: Apply the renderer to the Counties layer
                  */
-
-
+                var arrayLayerDrawingOptionsUSA = [];
+                var layerDrawingOptionsCounties = new LayerDrawingOptions();
+                layerDrawingOptionsCounties.renderer = cbrCountyPopDensity;
+                arrayLayerDrawingOptionsUSA[3] = layerDrawingOptionsCounties;
+                lyrUSA.setLayerDrawingOptions(arrayLayerDrawingOptionsUSA);
             }
 
 

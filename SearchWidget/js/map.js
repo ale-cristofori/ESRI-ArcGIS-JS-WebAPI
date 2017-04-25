@@ -11,12 +11,12 @@ require([
         "dojo/on",
         "dojo/parser",
         "dojo/ready",
-
+        "esri/dijit/Search",
         "dijit/layout/BorderContainer",
         "dijit/layout/ContentPane"],
     function (Map, 
               Color, array,
-              dom, on, parser, ready,
+              dom, on, parser, ready, Search,
               BorderContainer, ContentPane) {
 // @formatter:on
 
@@ -36,6 +36,10 @@ require([
             /*
              * Step: Add the Search widget
              */
-
+            var dijitSearch = new Search({
+                map: mapMain,
+                autoComplete: true
+            }, "divSearch");
+            dijitSearch.startup();
             });
     });
