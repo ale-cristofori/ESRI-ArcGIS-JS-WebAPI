@@ -11,6 +11,7 @@ require([
         "esri/Color",
 
         "esri/renderers/ClassBreaksRenderer",
+        "esri/renderers/SimpleRenderer",
 
         "dojo/ready",
         "dojo/parser",
@@ -26,7 +27,7 @@ require([
         "dijit/form/Button"],
     function (Map, ArcGISDynamicMapServiceLayer, FeatureLayer, LayerDrawingOptions,
               SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Color,
-              ClassBreaksRenderer,ready, parser, on, dom,
+              ClassBreaksRenderer, SimpleRenderer, ready, parser, on, dom,
               declare, array,
               BorderContainer, ContentPane, Button) {
 // @formatter:on
@@ -91,16 +92,26 @@ require([
                 /*
                  * Step: Construct and apply a simple renderer for earthquake features
                  */
+                var quakeRenderer = new SimpleRenderer(quakeSymbol);
+                lyrQuakes.setRenderer(quakeRenderer);
 
 
                 /*
                  * Step: Construct symbol size info parameters for the quake renderer
                  */
-
+                var sizeInfo = {
+                    filed: "MAGNITUDE",
+                    valueUnit: "unknown",
+                    mizSize: 1,
+                    maxSize: 50,
+                    minDataValue: 0,
+                    maxDataValue: 9
+                };
 
                 /*
                  * Step: Apply symbol size info to the quake renderer
                  */
+                quakeRenderer.setSizeInfo(sizeInfo);
 
 
             }

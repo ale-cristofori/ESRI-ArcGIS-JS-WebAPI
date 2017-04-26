@@ -10,9 +10,13 @@ require([
         "esri/symbols/SimpleMarkerSymbol",
         "esri/Color",
 
+        "esri/tasks/Geoprocessor",
+
         "esri/renderers/SimpleRenderer",
         "esri/renderers/ClassBreaksRenderer",
         "esri/layers/LayerDrawingOptions",
+
+        "esri/dijit/PopupTemplate",
 
         "dojo/ready",
         "dojo/parser",
@@ -27,8 +31,8 @@ require([
         "dijit/layout/ContentPane",
         "dijit/form/Button"],
     function (Map, ArcGISDynamicMapServiceLayer, FeatureLayer,
-              SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Color,
-              SimpleRenderer, ClassBreaksRenderer, LayerDrawingOptions,
+              SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Color, Geoprocessor,
+              SimpleRenderer, ClassBreaksRenderer, LayerDrawingOptions, PopupTemplate,
               ready, parser, on, dom,
               declare, array,
               BorderContainer, ContentPane, Button) {
@@ -79,7 +83,7 @@ require([
              * Step: Complete  the  popup template
              */
 
-            /*
+
 			var ptQuakes = new PopupTemplate({
 				"title": "Quake magnitude:  {MAGNITUDE}",
 				"fieldInfos": [ {
@@ -91,7 +95,7 @@ require([
 				}],
 				"description": "Current location: {LOCATION}"
 			});
-			*/
+
 
 
             // Specify the output fields
@@ -101,6 +105,7 @@ require([
             // Construct the Quakes layer
             var lyrQuakes = new FeatureLayer(sUrlQuakesLayer, {
                 outFields: outFieldsQuakes,
+                infoTemplate: ptQuakes
 
                 /*
                  * Step: Assign  the  popup template

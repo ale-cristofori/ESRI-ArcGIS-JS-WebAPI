@@ -11,11 +11,17 @@ require([
         "esri/symbols/SimpleFillSymbol",
         "esri/Color",
 
+
+        "esri/tasks/Geoprocessor",
+        "esri/tasks/FeatureSet",
+        "esri/tasks/LinearUnit",
+
         "dojo/ready",
         "dojo/parser",
         "dojo/on",
         "dojo/_base/array"],
     function (Map, Draw, Graphic, graphicsUtils, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, Color,
+              Geoprocessor, FeatureSet, LinearUnit,
               ready, parser, on, array) {
 // @formatter:on
 
@@ -25,25 +31,26 @@ require([
             // Parse DOM nodes decorated with the data-dojo-type attribute
             parser.parse();
 
+
             // Create the map
             mapMain = new Map("divMap", {
                 basemap: "topo",
-                center: [-122.45, 37.75],
-                zoom: 12
+                center: [10, 44.980],
+                zoom: 8
             });
 
             /*
              * Step: Construct the Geoprocessor
              */
-
+            var gpViewshed = new Geoprocessor("http://sampleserver5.arcgisonline.com/arcgis/rest/services/Elevation/ESRI_Elevation_World/GPServer/Viewshed");
 
             mapMain.on("load", function () {
+
                 /*
                  * Step: Set the spatial reference for output geometries
                  */
+                gpViewshed.outSpatialReference = mapMain.spatialReference;
 
-
-            });
 
             // Collect the input observation point
             var tbDraw = new Draw(mapMain);
@@ -68,22 +75,29 @@ require([
                 /*
                  * Step: Prepare the first input parameter
                  */
-
+                var fsInputPoint = new FeatureSet();
+                fsInputPoint.features.push(graphicViewpoint);
 
                 /*
                  * Step: Prepare the second input parameter
                  */
-
+                var luDistance = new LinearUnit();
+                luDistance.distance = 5;
+                luDistance.units = "esriMiles";
 
                 /*
                  * Step: Build the input parameters into a JSON-formatted object
                  */
-
+                var gpParams = {
+                    "Input_Observation_Point": fsInputPoint,
+                    "Viewshed_Distance": luDistance
+                };
 
                 /*
                  * Step: Wire and execute the Geoprocessor
                  */
-
+                gpViewshed.on("execute-complete", displayViewshed);
+                gpViewshed.execute(gpParams);
 
             }
 
@@ -97,6 +111,9 @@ require([
                 /*
                  * Step: Extract the array of features from the results
                  */
+                var pvResult = results.results[0];
+                var gpFeatureRecordSetLayer = pvResult.value;
+                var arrayFeatures = gpFeatureRecordSetLayer.features;
 
 
                 // loop through results
@@ -104,7 +121,8 @@ require([
                     /*
                      * Step: Symbolize and add each graphic to the map's graphics layer
                      */
-
+                    feature.setSymbol(sfsResultPolygon);
+                    mapMain.graphics.add(feature);
 
                 });
 
@@ -113,5 +131,6 @@ require([
                 mapMain.setExtent(extentViewshed, true);
             }
 
+            });
         });
     });
